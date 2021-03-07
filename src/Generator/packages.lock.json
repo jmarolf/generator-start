@@ -2,6 +2,12 @@
   "version": 2,
   "dependencies": {
     ".NETStandard,Version=v2.0": {
+      "IndexRange": {
+        "type": "Direct",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "6TgS1JLSUkpmPLfXBPaAgB39ZUix8E4soXWk2XSDcscVe84i1JKzIAtA7jHbRHSkOOrcr6YA0MpLCeq98y9mYQ=="
+      },
       "Microsoft.CodeAnalysis.Analyzers": {
         "type": "Direct",
         "requested": "[3.3.2, )",
@@ -26,6 +32,12 @@
           "Microsoft.Build.Tasks.Git": "1.0.0",
           "Microsoft.SourceLink.Common": "1.0.0"
         }
+      },
+      "Microsoft.VisualStudio.Threading.Analyzers": {
+        "type": "Direct",
+        "requested": "[16.9.54, )",
+        "resolved": "16.9.54",
+        "contentHash": "3qxcHAqPaKuaqVtomFFDmuigM0cZvcpfuM6hMOwrut0ivqnOEXP+EsZhJlL/L+Ye8eX/ha6tmI7x3oQJcrndbA=="
       },
       "NETStandard.Library": {
         "type": "Direct",

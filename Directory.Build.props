@@ -54,6 +54,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All"/>
+    <!-- Allow us to use newer C# features -->
+    <PackageReference Include="IndexRange" />
   </ItemGroup>
 
   <!-- Nullable annotations for netstandard 2.0 -->
