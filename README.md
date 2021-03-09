@@ -1,5 +1,5 @@
-# Recommended Roslyn Analyzer Repo Template
+# Recommended Roslyn Source Generators Repo Template
 
-Use this repo as a template for getting started with Roslyn Analyzers 
+Use this repo as a template for getting started with Roslyn Source Generators 
 
-See examples [here](https://github.com/dotnet/roslyn-sdk/tree/main/samples/CSharp/Analyzers/Analyzers.Implementation) to get started.
+See examples [here](https://github.com/dotnet/roslyn-sdk/tree/main/samples/CSharp/SourceGenerators) to get started.
