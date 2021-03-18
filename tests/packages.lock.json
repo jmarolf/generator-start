@@ -26,16 +26,16 @@
       },
       "Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit": {
         "type": "Direct",
-        "requested": "[1.0.1-beta1.21161.2, )",
-        "resolved": "1.0.1-beta1.21161.2",
-        "contentHash": "usaXBRNeQLCfCqvVSmoR5Y7xDNJmcQ1JZgSjtsykZKIxoG3THpdfv8ICmkzd3D5+clep35vGcNwW1eEmq6xzoA==",
+        "requested": "[1.0.1-beta1.21166.1, )",
+        "resolved": "1.0.1-beta1.21166.1",
+        "contentHash": "DiGE2wNVj8m/FlF9k9CrB3nlyAPlQ3v8HL98hdoLXcoGkro72a/XI3HN6FF5hWwRCC9W9tMDRhfK0dgeGu/JZA==",
         "dependencies": {
-          "Microsoft.CodeAnalysis.Analyzer.Testing": "1.0.1-beta1.21161.2",
+          "Microsoft.CodeAnalysis.Analyzer.Testing": "1.0.1-beta1.21166.1",
           "Microsoft.CodeAnalysis.Analyzers": "3.3.2",
-          "Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing": "1.0.1-beta1.21161.2",
+          "Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing": "1.0.1-beta1.21166.1",
           "Microsoft.CodeAnalysis.CSharp.Workspaces": "3.8.0",
-          "Microsoft.CodeAnalysis.SourceGenerators.Testing": "1.0.1-beta1.21161.2",
-          "Microsoft.CodeAnalysis.Testing.Verifiers.XUnit": "1.0.1-beta1.21161.2"
+          "Microsoft.CodeAnalysis.SourceGenerators.Testing": "1.0.1-beta1.21166.1",
+          "Microsoft.CodeAnalysis.Testing.Verifiers.XUnit": "1.0.1-beta1.21166.1"
         }
       },
       "Microsoft.NET.Test.Sdk": {
@@ -109,8 +109,8 @@
       },
       "Microsoft.CodeAnalysis.Analyzer.Testing": {
         "type": "Transitive",
-        "resolved": "1.0.1-beta1.21161.2",
-        "contentHash": "2z8I4hshiYam5IPBBhQnxfZmYUJ2tZWMWnmoCPMJW4DH/5fsu/XCY+g/0mbJ1TVdYK7E+V5b22L9LkAWbVioGA==",
+        "resolved": "1.0.1-beta1.21166.1",
+        "contentHash": "uForXWeehv0EB7LkvidjMq9Q/3D0O7kw0C4LQtG6iLPAd/kBKiAmfyfxiDQ/bq+JDDhnajld/lVRkcX7qjDxhQ==",
         "dependencies": {
           "DiffPlex": "1.4.4",
           "Microsoft.CodeAnalysis.Analyzers": "2.6.1",
@@ -140,30 +140,30 @@
       },
       "Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing": {
         "type": "Transitive",
-        "resolved": "1.0.1-beta1.21161.2",
-        "contentHash": "HaJ6A6/ymrE6xPE4tdwoYkDHK4+qEGhAIkiHqJ88ZdGttVdtQnqbEMJ4lepKGqzyQ31Q3KU5TGblnxuRU8A3Dw==",
+        "resolved": "1.0.1-beta1.21166.1",
+        "contentHash": "n5eerx0U6FvIuJuEQn0MeoPH0B7RqiKc9d4v7Up2mxVVmv3exXwFZm6pxdr4eH31vNGz3N1bY1sxQheOWy92gg==",
         "dependencies": {
           "Microsoft.CodeAnalysis.Analyzers": "3.3.2",
           "Microsoft.CodeAnalysis.CSharp.Workspaces": "3.8.0",
-          "Microsoft.CodeAnalysis.SourceGenerators.Testing": "1.0.1-beta1.21161.2"
+          "Microsoft.CodeAnalysis.SourceGenerators.Testing": "1.0.1-beta1.21166.1"
         }
       },
       "Microsoft.CodeAnalysis.SourceGenerators.Testing": {
         "type": "Transitive",
-        "resolved": "1.0.1-beta1.21161.2",
-        "contentHash": "3Vp7A9AUEVquvF3pfUKuAL6biV5pG0YXDfDwhK1FW6MoToFIikSzXFwkfqV22G27nuQbJiP1Q/qINKkoDr+5Tw==",
+        "resolved": "1.0.1-beta1.21166.1",
+        "contentHash": "lFzt1OY3PAGV/uDxYC8BbbNjDrz4psC3q3ytyWpdRyhgnCrpU/R1iLaViLsx5UWbjpFqscJoHkyO5hd0926ESQ==",
         "dependencies": {
-          "Microsoft.CodeAnalysis.Analyzer.Testing": "1.0.1-beta1.21161.2",
+          "Microsoft.CodeAnalysis.Analyzer.Testing": "1.0.1-beta1.21166.1",
           "Microsoft.CodeAnalysis.Analyzers": "3.3.2",
           "Microsoft.CodeAnalysis.Workspaces.Common": "3.8.0"
         }
       },
       "Microsoft.CodeAnalysis.Testing.Verifiers.XUnit": {
         "type": "Transitive",
-        "resolved": "1.0.1-beta1.21161.2",
-        "contentHash": "QBHlthTfCHME6m8JO8Kv1GlvAQ2eHtmTp6Ab+nBJNe6Xn+tQkzgonVJo6njmLLqnWtCSOhMCf/EyRNAslF9NBA==",
+        "resolved": "1.0.1-beta1.21166.1",
+        "contentHash": "E0Om1AU2stYVh1dUjTFOAnQJXyTHEF9AKdKDNyU13/txw7hf8sPm8FRBU7LlEJpjXFVpAGOeMut+IJRWOORzOA==",
         "dependencies": {
-          "Microsoft.CodeAnalysis.Analyzer.Testing": "1.0.1-beta1.21161.2",
+          "Microsoft.CodeAnalysis.Analyzer.Testing": "1.0.1-beta1.21166.1",
           "xunit.assert": "2.3.0"
         }
       },
