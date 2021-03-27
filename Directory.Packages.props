@@ -5,7 +5,7 @@
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="3.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.0.1-beta1.21166.1" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.0.1-beta1.21177.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.9.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
     <PackageVersion Include="TunnelVisionLabs.ReferenceAssemblyAnnotator" Version="1.0.0-alpha.160" />
