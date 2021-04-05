@@ -18,21 +18,19 @@ namespace Test
         [Fact]
         public async Task TestCodeFileIsGenerated()
         {
-            // We expect there to be compile errors before the generator runs
-            // Note how we have annotated where we expect these errors to happen with the {|ErrorId:|} syntax
             const string codeFile = @"
 using System;
-using {|CS0246:AutoNotify|};
+using AutoNotify;
 
 namespace GeneratedDemo
 {
     // The view model we'd like to augment
     public partial class ExampleViewModel
     {
-        [{|CS0246:{|CS0246:AutoNotify|}|}]
+        [AutoNotify]
         private string _text = ""private field text"";
 
-        [{|CS0246:{|CS0246:AutoNotify|}|}({|CS0246:PropertyName|} = ""Count"")]
+        [AutoNotify(PropertyName=""Count"")]
         private int _amount = 5;
     }
 
@@ -43,17 +41,17 @@ namespace GeneratedDemo
             ExampleViewModel vm = new ExampleViewModel();
 
             // we didn't explicitly create the 'Text' property, it was generated for us 
-            string text = vm.{|CS1061:Text|};
+            string text = vm.Text;
             Console.WriteLine($""Text = {text}"");
 
             // Properties can have differnt names generated based on the PropertyName argument of the attribute
-            int count = vm.{|CS1061:Count|};
+            int count = vm.Count;
             Console.WriteLine($""Count = {count}"");
 
             // the viewmodel will automatically implement INotifyPropertyChanged
-            vm.{|CS1061:PropertyChanged|} += (o, e) => Console.WriteLine($""Property {e.PropertyName} was changed"");
-            vm.{|CS1061:Text|} = ""abc"";
-            vm.{|CS1061:Count|} = 123;
+            vm.PropertyChanged += (o, e) => Console.WriteLine($""Property {e.PropertyName} was changed"");
+            vm.Text = ""abc"";
+            vm.Count = 123;
 
             // Try adding fields to the ExampleViewModel class above and tagging them with the [AutoNotify] attribute
             // You'll see the matching generated properties visibile in IntelliSense in realtime
