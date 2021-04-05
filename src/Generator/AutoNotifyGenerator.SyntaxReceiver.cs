@@ -21,6 +21,13 @@ namespace Generator
             /// </summary>
             public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
             {
+                var model = context.SemanticModel;
+                var attribute = model.Compilation.GetTypeByMetadataName("AutoNotify.AutoNotifyAttribute");
+                if (attribute is null)
+                {
+                    return;
+                }
+
                 // any field with at least one attribute is a candidate for property generation
                 if (context.Node is FieldDeclarationSyntax fieldDeclarationSyntax
                     && fieldDeclarationSyntax.AttributeLists.Count > 0)
@@ -30,7 +37,7 @@ namespace Generator
                         // Get the symbol being declared by the field, and keep it if its annotated
                         IFieldSymbol? fieldSymbol = context.SemanticModel.GetDeclaredSymbol(variable) as IFieldSymbol;
                         if (fieldSymbol is not null &&
-                            fieldSymbol.GetAttributes().Any(ad => ad.AttributeClass?.ToDisplayString() == "AutoNotify.AutoNotifyAttribute"))
+                            fieldSymbol.GetAttributes().Any(ad => ad.AttributeClass?.Equals(attribute, SymbolEqualityComparer.Default) == true))
                         {
                             Fields.Add(fieldSymbol);
                         }
