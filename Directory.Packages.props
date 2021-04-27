@@ -14,5 +14,6 @@
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
     <PackageVersion Include="IndexRange" Version="1.0.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.9.60" />
+    <PackageVersion Include="WebAssembly" Version="0.9.0-preview" />
   </ItemGroup>
 </Project>
