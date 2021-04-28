@@ -7,7 +7,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <DevelopmentDependency>true</DevelopmentDependency>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    
+
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddGeneratorsToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
