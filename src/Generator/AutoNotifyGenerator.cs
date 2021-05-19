@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -41,6 +42,14 @@ namespace AutoNotify
 
         public void Execute(GeneratorExecutionContext context)
         {
+            context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.MyGenerator_EnableLogging", out var emitLoggingSwitch);
+            if(bool.TryParse(emitLoggingSwitch, out var shouldLog))
+            {
+                // do some logging
+                Debug.WriteLine("Logging Enabled");
+            }
+
+
             // retrieve the populated receiver 
             if (context.SyntaxContextReceiver is not SyntaxReceiver receiver)
                 return;

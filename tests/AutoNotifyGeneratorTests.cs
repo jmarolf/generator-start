@@ -1,18 +1,10 @@
 using System.Threading.Tasks;
 using Xunit;
 using Generator;
-using Microsoft.CodeAnalysis.CSharp.Testing.XUnit;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
-using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis.Text;
-using System.Text;
-using System.IO;
 
 namespace Test
 {
-    using GeneratorTest = CSharpSourceGeneratorTest<AutoNotifyGenerator, XUnitVerifier>;
-
     public class AutoNotifyGeneratorTests
     {
         [Fact]
@@ -109,6 +101,7 @@ namespace AutoNotify
 
             await new GeneratorTest
             {
+                GlobalOptions = { ("build_property.MyGenerator_EnableLogging", "true") },
                 ReferenceAssemblies = ReferenceAssemblies.Net.Net50,
                 TestState =
                 {
