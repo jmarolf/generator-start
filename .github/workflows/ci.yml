@@ -16,13 +16,13 @@ jobs:
         configuration: [debug, release]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.4.0
         with:
           fetch-depth: 0
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1.7.2
+        uses: actions/setup-dotnet@v1.9.0
       - name: Try get cached dependencies
-        uses: actions/cache@v2.1.4
+        uses: actions/cache@v2.1.7
         with:
           path: ${{ github.workspace }}/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
@@ -37,7 +37,7 @@ jobs:
       - name: Test
         run: dotnet test --no-restore --no-build --configuration ${{ matrix.configuration }} --blame-crash --blame-hang --blame-hang-timeout 4m --logger "trx;LogFileName=TestResults.trx" -p:ParallelizeTestCollections=true --collect:"XPlat Code Coverage" --results-directory artifacts/test_results
       - name: Upload Results
-        uses: actions/upload-artifact@v2.2.2
+        uses: actions/upload-artifact@v2.3.1
         with:
           name: ${{ matrix.os }}_${{ matrix.configuration }}
           path: |
