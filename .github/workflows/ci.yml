@@ -33,7 +33,7 @@ jobs:
       - name: Build
         run: dotnet msbuild -p:Configuration=${{ matrix.configuration }} -graph -isolate -bl:artifacts/log/build.binlog
       - name: Test
-        run: dotnet test --no-restore --no-build --configuration ${{ matrix.configuration }} --blame-crash --blame-hang --blame-hang-timeout 4m --logger "trx;LogFileName=TestResults.trx" -p:ParallelizeTestCollections=true --collect:"XPlat Code Coverage" --results-directory artifacts/test_results
+        run: dotnet test --blame-crash --blame-hang --blame-hang-timeout 4m --logger "trx;LogFileName=TestResults.trx" --collect:"XPlat Code Coverage" --results-directory artifacts/test_results artifacts/bin/Tests/${{ matrix.configuration }}/net6.0/Tests.dll
       - name: Upload Results
         uses: actions/upload-artifact@v2.3.1
         with:
