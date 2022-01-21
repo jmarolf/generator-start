@@ -27,16 +27,10 @@
     <LangVersion>latest</LangVersion> <!-- Ensure all projects use the latest language version -->
     <Nullable>enable</Nullable> <!-- Turn on nullable-reference-type analysis -->
   </PropertyGroup>
-
   <ItemGroup>
-    <!-- Use reproduceable builds feature -->
-    <PackageReference Include="DotNet.ReproducibleBuilds" PrivateAssets="All"/>
-    <!-- Use package versioning -->
-    <PackageReference Include="Nerdbank.GitVersioning" PrivateAssets="All" />
     <!-- Allow us to use newer C# features -->
     <PackageReference Include="IndexRange" />
   </ItemGroup>
-
   <!-- Nullable annotations for netstandard 2.0 -->
   <PropertyGroup>
     <AnnotatedReferenceAssemblyVersion>6.0.1</AnnotatedReferenceAssemblyVersion>
@@ -45,6 +39,13 @@
   <ItemGroup>
     <PackageReference Include="TunnelVisionLabs.ReferenceAssemblyAnnotator" PrivateAssets="all" />
     <PackageDownload Include="Microsoft.NETCore.App.Ref" Version="[$(AnnotatedReferenceAssemblyVersion)]" />
+  </ItemGroup>
+    
+  <ItemGroup>
+    <!-- Use reproduceable builds feature -->
+    <PackageReference Include="DotNet.ReproducibleBuilds" PrivateAssets="All"/>
+    <!-- Use package versioning -->
+    <PackageReference Include="Nerdbank.GitVersioning" PrivateAssets="All" />
   </ItemGroup>
     
 </Project>

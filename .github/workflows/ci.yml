@@ -31,9 +31,7 @@ jobs:
       - name: Validate dependencies
         run: dotnet restore --locked-mode --packages ${{ github.workspace }}/.nuget/packages
       - name: Build
-        run: dotnet msbuild -noLogo -m -p:Configuration=${{ matrix.configuration }} -bl:artifacts/log/build.binlog
-      - name: Pack
-        run: dotnet pack --no-build --no-restore --nologo --configuration ${{ matrix.configuration }} --output artifacts/packages
+        run: dotnet msbuild -p:Configuration=${{ matrix.configuration }} -graph -isolate -bl:artifacts/log/build.binlog
       - name: Test
         run: dotnet test --no-restore --no-build --configuration ${{ matrix.configuration }} --blame-crash --blame-hang --blame-hang-timeout 4m --logger "trx;LogFileName=TestResults.trx" -p:ParallelizeTestCollections=true --collect:"XPlat Code Coverage" --results-directory artifacts/test_results
       - name: Upload Results
