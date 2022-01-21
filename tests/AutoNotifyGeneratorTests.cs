@@ -1,24 +1,25 @@
 using System.Threading.Tasks;
-using Xunit;
+
 using Generator;
-using Microsoft.CodeAnalysis.CSharp.Testing.XUnit;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
+
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis.Text;
-using System.Text;
-using System.IO;
+using Microsoft.CodeAnalysis.Testing.Verifiers;
 
-namespace Test
+using Tests;
+
+using Xunit;
+
+namespace Test;
+
+using GeneratorTest = CSharpSourceGeneratorTest<Adapter<AutoNotifyGenerator>, XUnitVerifier>;
+
+public class AutoNotifyGeneratorTests
 {
-    using GeneratorTest = CSharpSourceGeneratorTest<AutoNotifyGenerator, XUnitVerifier>;
-
-    public class AutoNotifyGeneratorTests
+    [Fact]
+    public async Task TestCodeFileIsGenerated()
     {
-        [Fact]
-        public async Task TestCodeFileIsGenerated()
-        {
-            const string codeFile = @"
+        const string codeFile = @"
 using System;
 using AutoNotify;
 
@@ -59,39 +60,43 @@ namespace GeneratedDemo
     }
 }
 ";
-            const string generatedCode = @"
-namespace GeneratedDemo
+        const string generatedCode = @"namespace GeneratedDemo
 {
     public partial class ExampleViewModel : System.ComponentModel.INotifyPropertyChanged
     {
-public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-public string Text 
-{
-    get 
-    {
-        return this._text;
-    }
-    set
-    {
-        this._text = value;
-        this.PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Text)));
-    }
-}
+        public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
+        protected void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = """")
+            => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 
-public int Count 
-{
-    get 
-    {
-        return this._amount;
-    }
-    set
-    {
-        this._amount = value;
-        this.PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Count)));
+        public virtual string Text
+        {
+            get => this._text;
+            set
+            {
+                if (!System.Collections.Generic.EqualityComparer<string>.Default.Equals(this._text, value))
+                {
+                    this._text = value;
+                    NotifyPropertyChanged(nameof(Text));
+                }
+            }
+        }
+
+        public virtual int Count
+        {
+            get => this._amount;
+            set
+            {
+                if (!System.Collections.Generic.EqualityComparer<int>.Default.Equals(this._amount, value))
+                {
+                    this._amount = value;
+                    NotifyPropertyChanged(nameof(Count));
+                }
+            }
+        }
     }
 }
-} }";
-            const string attributeText = @"
+";
+        const string attributeText = @"
 using System;
 namespace AutoNotify
 {
@@ -107,19 +112,18 @@ namespace AutoNotify
 }
 ";
 
-            await new GeneratorTest
-            {
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net50,
-                TestState =
+        await new GeneratorTest
+        {
+            ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
+            TestState =
                 {
                     Sources = { codeFile },
                     GeneratedSources =
                     {
-                        (typeof(AutoNotifyGenerator), "AutoNotifyAttribute.cs", attributeText),
-                        (typeof(AutoNotifyGenerator), "ExampleViewModel_autoNotify.cs", generatedCode),
+                        (typeof(Adapter<AutoNotifyGenerator>), "AutoNotifyAttribute.cs", attributeText),
+                        (typeof(Adapter<AutoNotifyGenerator>), "ExampleViewModel_autoNotify.cs", generatedCode),
                     },
                 },
-            }.RunAsync();
-        }
+        }.RunAsync();
     }
 }
