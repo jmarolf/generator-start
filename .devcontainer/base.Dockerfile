@@ -1,5 +1,5 @@
 # [Choice] .NET version: 5.0, 3.1, 2.1
-ARG VARIANT="5.0"
+ARG VARIANT="6.0"
 FROM mcr.microsoft.com/dotnet/sdk:${VARIANT}-focal
 
 # [Option] Install zsh

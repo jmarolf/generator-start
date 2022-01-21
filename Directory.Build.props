@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
 
+  <Sdk Name="DotNet.ReproducibleBuilds.Isolated" Version="1.1.1" />
   <!-- Import our custom build layout -->
   <Import Project="eng\Settings.props" />
 
@@ -22,46 +23,26 @@
   
   <!-- Compiler settings -->
   <PropertyGroup>
-    <AnalysisLevel>6</AnalysisLevel> <!-- Opt into more advanced analysis -->
-    <LangVersion>9</LangVersion> <!-- Ensure all projects use the latest language version -->
+    <AnalysisLevel>latest</AnalysisLevel> <!-- Opt into more advanced analysis -->
+    <LangVersion>latest</LangVersion> <!-- Ensure all projects use the latest language version -->
     <Nullable>enable</Nullable> <!-- Turn on nullable-reference-type analysis -->
   </PropertyGroup>
 
-  <!-- Debug Symbol settings -->
-  <PropertyGroup>
-    <!--
-      Official build:
-       - Build standalone Portable PDBs to reduce the size of the binaries.
-      PR validation build:
-       - Embed PDBs to make it easier to debug crash dumps captured on the CI machine.
-      Developer build:
-       - Embed PDBs to be consistent with PR validation build.    
-    -->
-    <DebugType>portable</DebugType>
-    <DebugType Condition="'$(OfficialBuild)' != 'true'">embedded</DebugType>
-  </PropertyGroup>
-
-  <!-- sourcelink settings -->
-  <PropertyGroup>
-    <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <!--Embed source files that are not tracked by the source control manager in the PDB -->
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <!-- Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
-    <!-- Produce snupkg in official builds (when not embedding PDBs to dlls) -->
-    <IncludeSymbols>false</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All"/>
+    <!-- Use reproduceable builds feature -->
+    <PackageReference Include="DotNet.ReproducibleBuilds" PrivateAssets="All"/>
     <!-- Allow us to use newer C# features -->
     <PackageReference Include="IndexRange" />
   </ItemGroup>
 
   <!-- Nullable annotations for netstandard 2.0 -->
+  <PropertyGroup>
+    <AnnotatedReferenceAssemblyVersion>6.0.1</AnnotatedReferenceAssemblyVersion>
+    <GenerateNullableAttributes>true</GenerateNullableAttributes>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TunnelVisionLabs.ReferenceAssemblyAnnotator" PrivateAssets="all" />
-    <PackageDownload Include="Microsoft.NETCore.App.Ref" Version="[5.0.0]" />
+    <PackageDownload Include="Microsoft.NETCore.App.Ref" Version="[$(AnnotatedReferenceAssemblyVersion)]" />
   </ItemGroup>
     
 </Project>
