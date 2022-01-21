@@ -1,154 +1,113 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Generator;
 
-[Generator]
-public partial class AutoNotifyGenerator : ISourceGenerator
+[Generator(LanguageNames.CSharp)]
+public partial class AutoNotifyGenerator : IIncrementalGenerator
 {
-    private const string AttributeText = @"
+    private const string NamespaceNameText = "AutoNotify";
+    private const string TypeNameText = "AutoNotifyAttribute";
+    private const string AttributeFullTypeName = NamespaceNameText + "." + TypeNameText;
+    private const string AttributeText = $@"
 using System;
-namespace AutoNotify
-{
+namespace {NamespaceNameText}
+{{
     [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
     [System.Diagnostics.Conditional(""AutoNotifyGenerator_DEBUG"")]
-    sealed class AutoNotifyAttribute : Attribute
-    {
-        public AutoNotifyAttribute()
-        {
-        }
-        public string PropertyName { get; set; }
-    }
-}
+    sealed class {TypeNameText} : Attribute
+    {{
+        public {TypeNameText}()
+        {{
+        }}
+        public string PropertyName {{ get; set; }}
+    }}
+}}
 ";
 
-    public void Initialize(GeneratorInitializationContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // Register the attribute source
-        context.RegisterForPostInitialization((i) => i.AddSource("AutoNotifyAttribute", SourceText.From(AttributeText, Encoding.UTF8)));
+        context.RegisterPostInitializationOutput(static context => context.AddSource("AutoNotifyAttribute", AttributeText));
 
-        // Register a syntax receiver that will be created for each generation pass
-        context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
+        // Get fields with our attributes grouped by containing type
+        var fieldSymbols = context.SyntaxProvider.CreateSyntaxProvider(
+            predicate: IsFieldDeclarationWithAttribute,
+            transform: GetFieldSymbols)
+        .SelectMany(static (fields, _) => fields)
+        .Collect()
+        .Select(GroupFieldsByContainingType)
+        .SelectMany(static (groups, _) => groups);
+
+        var data = context.CompilationProvider.Select(
+            static (compilation, token) =>
+            {
+                var inotifyPropertyChanged = compilation.GetTypeByMetadataName("System.ComponentModel.INotifyPropertyChanged");
+                var autoNotifyAttribute = compilation.GetTypeByMetadataName(AttributeFullTypeName);
+                var systemObject = compilation.GetSpecialType(SpecialType.System_Object);
+                return (INotifyPropertyChanged: inotifyPropertyChanged, AutoNotifyAttribute: autoNotifyAttribute, Object: systemObject);
+            })
+            .Combine(fieldSymbols.Collect());
+
+        context.RegisterSourceOutput(data, GenerateSource);
     }
 
-    public void Execute(GeneratorExecutionContext context)
+    private static bool IsFieldDeclarationWithAttribute(SyntaxNode node, CancellationToken _)
+        => node is FieldDeclarationSyntax fieldDeclarationSyntax && fieldDeclarationSyntax.AttributeLists.Count > 0;
+
+    private static IEnumerable<IFieldSymbol> GetFieldSymbols(GeneratorSyntaxContext context, CancellationToken token)
     {
-        // retrieve the populated receiver 
-        if (context.SyntaxContextReceiver is not SyntaxReceiver receiver)
-            return;
+        var fieldDeclarationSyntax = (FieldDeclarationSyntax)context.Node;
+        foreach (var variable in fieldDeclarationSyntax.Declaration.Variables)
+        {
+            // Get the symbol being declared by the field, and keep it if its annotated
+            if (context.SemanticModel.GetDeclaredSymbol(variable, cancellationToken: token) is IFieldSymbol fieldSymbol &&
+                fieldSymbol.GetAttributes().Any(ad => ad.AttributeClass?.ToDisplayString() == AttributeFullTypeName))
+            {
+                yield return fieldSymbol;
+            }
+        }
+    }
 
-        // get the added attribute, and INotifyPropertyChanged
-        INamedTypeSymbol? attributeSymbol = context.Compilation.GetTypeByMetadataName("AutoNotify.AutoNotifyAttribute");
-        INamedTypeSymbol? notifySymbol = context.Compilation.GetTypeByMetadataName("System.ComponentModel.INotifyPropertyChanged");
+    private static IEnumerable<IGrouping<ISymbol?, IFieldSymbol>> GroupFieldsByContainingType(
+        ImmutableArray<IFieldSymbol> fieldSymbols, CancellationToken _)
+        => fieldSymbols.GroupBy(field => field.ContainingType, SymbolEqualityComparer.Default);
 
+    private static void GenerateSource(
+        SourceProductionContext context,
+        (
+            (INamedTypeSymbol? INotifyPropertyChanged, INamedTypeSymbol? AutoNotifyAttribute, INamedTypeSymbol Object) RequiredSymbols,
+            ImmutableArray<IGrouping<ISymbol?, IFieldSymbol>> TypesAndFields
+        ) data)
+    {
+        var attributeSymbol = data.RequiredSymbols.AutoNotifyAttribute;
+        var notifySymbol = data.RequiredSymbols.INotifyPropertyChanged;
+        var objectSymbol = data.RequiredSymbols.Object;
         if (attributeSymbol is null || notifySymbol is null)
         {
             return;
         }
 
-        // group the fields by class, and generate the source
-        foreach (var group in receiver.Fields.GroupBy(f => f.ContainingType, SymbolEqualityComparer.Default))
+        var builder = new SourceCodeBuilder(attributeSymbol, notifySymbol, objectSymbol, context.ReportDiagnostic);
+        foreach (var group in data.TypesAndFields)
         {
-            if (group.Key is not INamedTypeSymbol namedType)
+            var containgingType = group.Key;
+            if (containgingType is not INamedTypeSymbol namedTypeSymbol)
             {
                 continue;
             }
 
-            string? classSource = ProcessClass(namedType, group.ToList(), attributeSymbol, notifySymbol);
-            if (classSource is not null)
+            var fields = group.ToImmutableArray();
+            if (builder.TryGeneratePartialType(namedTypeSymbol, fields, out var partialType))
             {
-                context.AddSource($"{group.Key.Name}_autoNotify.cs", SourceText.From(classSource, Encoding.UTF8));
+                context.AddSource($"{containgingType.Name}_autoNotify.cs", SourceText.From(partialType, Encoding.UTF8));
             }
-        }
-    }
-
-    private static string? ProcessClass(INamedTypeSymbol classSymbol,
-                                        List<IFieldSymbol> fields,
-                                        ISymbol attributeSymbol,
-                                        ISymbol notifySymbol)
-    {
-        if (!classSymbol.ContainingSymbol.Equals(classSymbol.ContainingNamespace, SymbolEqualityComparer.Default))
-        {
-            return null; //TODO: issue a diagnostic that it must be top level
-        }
-
-        string namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
-
-        // begin building the generated source
-        StringBuilder source = new($@"
-namespace {namespaceName}
-{{
-    public partial class {classSymbol.Name} : {notifySymbol.ToDisplayString()}
-    {{
-");
-
-        // if the class doesn't implement INotifyPropertyChanged already, add it
-        if (!classSymbol.Interfaces.Contains(notifySymbol, SymbolEqualityComparer.Default))
-        {
-            source.Append("public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;");
-        }
-
-        // create properties for each field 
-        foreach (IFieldSymbol fieldSymbol in fields)
-        {
-            ProcessField(source, fieldSymbol, attributeSymbol);
-        }
-
-        source.Append("} }");
-        return source.ToString();
-    }
-
-    private static void ProcessField(StringBuilder source, IFieldSymbol fieldSymbol, ISymbol attributeSymbol)
-    {
-        // get the name and type of the field
-        string fieldName = fieldSymbol.Name;
-        ITypeSymbol fieldType = fieldSymbol.Type;
-
-        // get the AutoNotify attribute from the field, and any associated data
-        AttributeData attributeData = fieldSymbol.GetAttributes().Single(ad => ad.AttributeClass?.Equals(attributeSymbol, SymbolEqualityComparer.Default) == true);
-        TypedConstant overridenNameOpt = attributeData.NamedArguments.SingleOrDefault(kvp => kvp.Key == "PropertyName").Value;
-
-        string? propertyName = ChooseName(fieldName, overridenNameOpt);
-        if (propertyName is { Length: 0 } || propertyName == fieldName)
-        {
-            //TODO: issue a diagnostic that we can't process this field
-            return;
-        }
-
-        source.Append($@"
-public {fieldType} {propertyName} 
-{{
-    get 
-    {{
-        return this.{fieldName};
-    }}
-    set
-    {{
-        this.{fieldName} = value;
-        this.PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof({propertyName})));
-    }}
-}}
-");
-
-        return;
-
-        static string? ChooseName(string fieldName, TypedConstant overridenNameOpt)
-        {
-            if (!overridenNameOpt.IsNull)
-            {
-                return overridenNameOpt.Value?.ToString();
-            }
-
-            fieldName = fieldName.TrimStart('_');
-            return fieldName.Length == 0 ? string.Empty : fieldName.Length == 1 ? fieldName.ToUpper() : fieldName[..1].ToUpper() + fieldName[1..];
         }
     }
 }
