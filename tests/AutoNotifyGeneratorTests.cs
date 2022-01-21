@@ -1,24 +1,27 @@
-using System.Threading.Tasks;
-using Xunit;
-using Generator;
-using Microsoft.CodeAnalysis.CSharp.Testing.XUnit;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
-using Microsoft.CodeAnalysis.CSharp.Testing;
-using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis.Text;
-using System.Text;
 using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Test
+using Generator;
+
+using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.CSharp.Testing.XUnit;
+using Microsoft.CodeAnalysis.Testing;
+using Microsoft.CodeAnalysis.Testing.Verifiers;
+using Microsoft.CodeAnalysis.Text;
+
+using Xunit;
+
+namespace Test;
+
+using GeneratorTest = CSharpSourceGeneratorTest<AutoNotifyGenerator, XUnitVerifier>;
+
+public class AutoNotifyGeneratorTests
 {
-    using GeneratorTest = CSharpSourceGeneratorTest<AutoNotifyGenerator, XUnitVerifier>;
-
-    public class AutoNotifyGeneratorTests
+    [Fact]
+    public async Task TestCodeFileIsGenerated()
     {
-        [Fact]
-        public async Task TestCodeFileIsGenerated()
-        {
-            const string codeFile = @"
+        const string codeFile = @"
 using System;
 using AutoNotify;
 
@@ -59,7 +62,7 @@ namespace GeneratedDemo
     }
 }
 ";
-            const string generatedCode = @"
+        const string generatedCode = @"
 namespace GeneratedDemo
 {
     public partial class ExampleViewModel : System.ComponentModel.INotifyPropertyChanged
@@ -91,7 +94,7 @@ public int Count
     }
 }
 } }";
-            const string attributeText = @"
+        const string attributeText = @"
 using System;
 namespace AutoNotify
 {
@@ -107,10 +110,10 @@ namespace AutoNotify
 }
 ";
 
-            await new GeneratorTest
-            {
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net50,
-                TestState =
+        await new GeneratorTest
+        {
+            ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
+            TestState =
                 {
                     Sources = { codeFile },
                     GeneratedSources =
@@ -119,7 +122,6 @@ namespace AutoNotify
                         (typeof(AutoNotifyGenerator), "ExampleViewModel_autoNotify.cs", generatedCode),
                     },
                 },
-            }.RunAsync();
-        }
+        }.RunAsync();
     }
 }
